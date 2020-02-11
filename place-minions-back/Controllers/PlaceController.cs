@@ -14,23 +14,24 @@ namespace place_minions_back.Controllers
     public class PlaceController : ControllerBase
     {
         // GET: api/Place/map
-        [HttpGet(Name = "map")]
+        [HttpGet("map")]
         public async Task<IEnumerable<MapData>> GetMap()
         {
-            byte[] map = await FileIO.ReadAllBytesAsync(Program.MapPath);
+            string mapstr = await FileIO.ReadAllTextAsync(Program.MapPath);
+            byte[] map = mapstr.Split("\n").Select(x => Byte.Parse(x)).ToArray();
             return map.Select((x, ind) => new MapData(ind / 100, ind % 100, HtmlPlaceColors[(int)x]));
         }
 
         // GET: api/Place/setp/0/1/16
-        [HttpGet("{x}/{y}/{color}", Name = "setp")]
+        [HttpGet("setp/{x}/{y}/{color}")]
         public string SetPixel(int x, int y, int c)
         {
             return "value";
         }
 
         // GET: api/Place/colors
-        [HttpGet(Name = "colors")]
-        public IEnumerable<string> GetColors(int x, int y, int c)
+        [HttpGet("colors")]
+        public IEnumerable<string> GetColors()
         {
             return HtmlPlaceColors;
         }
@@ -64,16 +65,16 @@ namespace place_minions_back.Controllers
         };
     }
 
-    public struct MapData
+    public class MapData
     {
-        public byte X;
-        public byte Y;
+        public int X;
+        public int Y;
         public string Color;
 
         public MapData(int x, int y, string color)
         {
-            X = (byte)x;
-            Y = (byte)y;
+            X = x;
+            Y = y;
             Color = color;
         }
     }

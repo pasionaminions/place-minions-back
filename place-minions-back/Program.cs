@@ -13,8 +13,8 @@ namespace place_minions_back
 {
     public class Program
     {
-        public static string HistoryPath = Path.GetFullPath(@"..\place-history.csv");
-        public static string MapPath = Path.GetFullPath(@"..\place-map.csv");
+        public static string HistoryPath = Path.GetFullPath(@".\place-history.csv");
+        public static string MapPath = Path.GetFullPath(@".\place-map.csv");
 
         public static BinaryFormatter bf = new BinaryFormatter();
 
@@ -24,7 +24,7 @@ namespace place_minions_back
             {
                 File.WriteAllText(HistoryPath, "ts,x,y,col");
                 byte[] arr = new byte[100 * 100];
-                File.WriteAllBytes(MapPath, arr);
+                File.WriteAllText(MapPath, String.Join('\n', arr));
             }
 
             CreateHostBuilder(args).Build().Run();
