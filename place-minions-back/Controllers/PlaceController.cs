@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using FileIO = System.IO.File;
 
 namespace place_minions_back.Controllers
 {
@@ -12,37 +13,35 @@ namespace place_minions_back.Controllers
     [ApiController]
     public class PlaceController : ControllerBase
     {
-        // GET: api/Place
-        [HttpGet]
-        public IEnumerable<string> Get()
+        // GET: api/Place/map
+        [HttpGet(Name = "map")]
+        public async Task<IEnumerable<MapData>> GetMap()
         {
-            return new string[] { "value1", "value2" };
+            byte[] map = await FileIO.ReadAllBytesAsync(Program.MapPath);
+            return map.Select((x, ind) => new MapData(ind / 100, ind % 100, HtmlPlaceColors[(int)x]));
         }
 
-        // GET: api/Place/5
+        // GET: api/Place/setp/0/1/16
         [HttpGet("{x}/{y}/{color}", Name = "setp")]
-        public string Get(int x, int y, int c)
+        public string SetPixel(int x, int y, int c)
         {
             return "value";
         }
 
-        // POST: api/Place
-        [HttpPost]
-        public void Post([FromBody] string value)
+        // GET: api/Place/colors
+        [HttpGet(Name = "colors")]
+        public IEnumerable<string> GetColors(int x, int y, int c)
         {
+            return HtmlPlaceColors;
         }
 
-        // PUT: api/Place/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public string [] HtmlPlaceColors
         {
-        }
-
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+            get
+            {
+                return RedditPlaceColors.Select(x => ColorTranslator.ToHtml(x)).ToArray();
+            }
+        } 
 
         static Color[] RedditPlaceColors = new Color[]
         {
@@ -65,5 +64,18 @@ namespace place_minions_back.Controllers
         };
     }
 
+    public struct MapData
+    {
+        public byte X;
+        public byte Y;
+        public string Color;
+
+        public MapData(int x, int y, string color)
+        {
+            X = (byte)x;
+            Y = (byte)y;
+            Color = color;
+        }
+    }
 
 }
