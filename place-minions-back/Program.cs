@@ -22,7 +22,7 @@ namespace place_minions_back
         {
             if (!(File.Exists(HistoryPath) && File.Exists(MapPath)))
             {
-                File.WriteAllText(HistoryPath, "ts,x,y,col");
+                File.WriteAllText(HistoryPath, "ts,x,y,col\n");
                 byte[] arr = new byte[100 * 100];
                 File.WriteAllText(MapPath, String.Join('\n', arr));
             }

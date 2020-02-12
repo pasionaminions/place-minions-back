@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -15,18 +16,40 @@ namespace place_minions_back.Controllers
     {
         // GET: api/Place/map
         [HttpGet("map")]
-        public async Task<IEnumerable<MapData>> GetMap()
+        public async Task<byte[,]> GetMap()
         {
+            /*{
+             *  x: int,
+             *  y: int,
+             *  Color: string (#FFFFFF)
+             * }
+             */
             string mapstr = await FileIO.ReadAllTextAsync(Program.MapPath);
             byte[] map = mapstr.Split("\n").Select(x => Byte.Parse(x)).ToArray();
-            return map.Select((x, ind) => new MapData(ind / 100, ind % 100, HtmlPlaceColors[(int)x]));
+            //var res = map.Select((x, ind) => new MapData(ind / 100, ind % 100, HtmlPlaceColors[(int)x])).ToList();
+            byte[,] res = new byte[100, 100];
+            for (int i = 0; i < map.Length; i++)
+            {
+                res[i / 100, i % 100] = map[i];
+            }   
+            
+            return res;
         }
 
         // GET: api/Place/setp/0/1/16
-        [HttpGet("setp/{x}/{y}/{color}")]
-        public string SetPixel(int x, int y, int c)
+        [HttpGet("setp/{x}/{y}/{c}")]
+        public async Task<ActionResult> SetPixel(int x, int y, int c)
         {
-            return "value";
+            if (c < 0 || c >= 16) return BadRequest();
+            if (x >= 99 || x < 0 || y >= 99 || y < 0) return BadRequest();
+            string mapstr = await FileIO.ReadAllTextAsync(Program.MapPath);
+            byte[] map = mapstr.Split("\n").Select(x => Byte.Parse(x)).ToArray();
+            map[y*100 + x] = (byte)c;
+            FileIO.WriteAllText(Program.MapPath, String.Join('\n', map));            
+            StreamWriter sw = FileIO.AppendText(Program.HistoryPath);
+            DateTime dt = new DateTime().Date;
+            await sw.WriteLineAsync($"{dt.Ticks},{x},{y},{c}").ContinueWith((_) => sw.Close());
+            return Ok();
         }
 
         // GET: api/Place/colors
@@ -65,7 +88,7 @@ namespace place_minions_back.Controllers
         };
     }
 
-    public class MapData
+    public struct MapData
     {
         public int X;
         public int Y;
