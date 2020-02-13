@@ -37,7 +37,7 @@ namespace place_minions_back.Controllers
         }
 
         // GET: api/Place/setp/0/1/16
-        [HttpGet("setp/{x}/{y}/{c}")]
+        [HttpPost("setp")]
         public async Task<ActionResult> SetPixel(int x, int y, int c)
         {
             if (c < 0 || c >= 16) return BadRequest();
@@ -54,9 +54,9 @@ namespace place_minions_back.Controllers
 
         // GET: api/Place/colors
         [HttpGet("colors")]
-        public IEnumerable<string> GetColors()
+        public ActionResult GetColors()
         {
-            return HtmlPlaceColors;
+            return Ok(HtmlPlaceColors);
         }
 
         public string [] HtmlPlaceColors
