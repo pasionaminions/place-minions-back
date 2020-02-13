@@ -44,7 +44,7 @@ namespace place_minions_back.Controllers
             int x = data.X;
             int y = data.Y;
             if (c < 0 || c >= 16) return BadRequest();
-            if (x >= 99 || x < 0 || y >= 99 || y < 0) return BadRequest();
+            if (x > 99 || x < 0 || y > 99 || y < 0) return BadRequest();
             string mapstr = await FileIO.ReadAllTextAsync(Program.MapPath);
             byte[] map = mapstr.Split("\n").Select(x => Byte.Parse(x)).ToArray();
             map[y*100 + x] = (byte)c;
