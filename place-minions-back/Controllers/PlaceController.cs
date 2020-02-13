@@ -36,10 +36,13 @@ namespace place_minions_back.Controllers
             return res;
         }
 
-        // GET: api/Place/setp/0/1/16
+        // POST: api/Place/setp/0/1/16
         [HttpPost("setp")]
-        public async Task<ActionResult> SetPixel(int x, int y, int c)
+        public async Task<ActionResult<MapData>> SetPixel(MapData data)
         {
+            int c = data.Color;
+            int x = data.X;
+            int y = data.Y;
             if (c < 0 || c >= 16) return BadRequest();
             if (x >= 99 || x < 0 || y >= 99 || y < 0) return BadRequest();
             string mapstr = await FileIO.ReadAllTextAsync(Program.MapPath);
@@ -49,7 +52,7 @@ namespace place_minions_back.Controllers
             StreamWriter sw = FileIO.AppendText(Program.HistoryPath);
             DateTime dt = new DateTime().Date;
             await sw.WriteLineAsync($"{dt.Ticks},{x},{y},{c}").ContinueWith((_) => sw.Close());
-            return Ok();
+            return Ok(data);
         }
 
         // GET: api/Place/colors
@@ -92,9 +95,9 @@ namespace place_minions_back.Controllers
     {
         public int X;
         public int Y;
-        public string Color;
+        public int Color;
 
-        public MapData(int x, int y, string color)
+        public MapData(int x, int y, int color)
         {
             X = x;
             Y = y;
