@@ -50,7 +50,7 @@ namespace place_minions_back.Controllers
             map[y*100 + x] = (byte)c;
             FileIO.WriteAllText(Program.MapPath, String.Join('\n', map));            
             StreamWriter sw = FileIO.AppendText(Program.HistoryPath);
-            DateTime dt = new DateTime().Date;
+            DateTime dt = DateTime.Now;
             await sw.WriteLineAsync($"{dt.Ticks},{x},{y},{c}").ContinueWith((_) => sw.Close());
             return Ok(data);
         }
